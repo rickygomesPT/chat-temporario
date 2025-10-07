@@ -26,9 +26,27 @@ function createRoom() {
 function joinRoom() {
   const user = document.getElementById('userName').value.trim();
   const roomCode = document.getElementById('joinRoomCode').value.trim();
-  if (!user || !roomCode) return alert("Preencha todos os campos.");
 
-  localStorage.setItem("roomCode", roomCode);
-  localStorage.setItem("userName", user);
-  window.location.href = "./chat.html";
+  if (!user || !roomCode) {
+    alert("Preencha todos os campos.");
+    return;
+  }
+
+  // Verificar se a sala existe no Firebase antes de entrar
+  const db = firebase.database();
+  db.ref("rooms/" + roomCode).get().then(snapshot => {
+    if (snapshot.exists()) {
+      // Sala existe → entrar
+      localStorage.setItem("roomCode", roomCode);
+      localStorage.setItem("userName", user);
+      window.location.href = "./chat.html";
+    } else {
+      // Sala não existe → erro
+      alert("⚠️ A sala com o código '" + roomCode + "' não existe!");
+    }
+  }).catch(error => {
+    console.error("Erro ao verificar a sala:", error);
+    alert("Ocorreu um erro ao tentar aceder à sala.");
+  });
 }
+
