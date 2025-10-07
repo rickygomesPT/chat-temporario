@@ -1,4 +1,4 @@
-// ⚠️ Altere estas variáveis com suas credenciais Firebase
+// ====== Firebase Config ======
 const firebaseConfig = {
     apiKey: "AIzaSyDT6QUagkLGAh3QzmmwDATtRlsg2DbwRRw",
     authDomain: "world-tycoon-sxop6.firebaseapp.com",
@@ -30,7 +30,7 @@ function createRoom() {
         roomName: roomName,
         creator: creator,
         createdAt: Date.now(),
-        roomDuration: roomTimeMin * 60 * 1000 // converter para ms
+        roomDuration: roomTimeMin * 60 * 1000
     }, (error) => {
         if (!error) {
             localStorage.setItem("userName", creator);
