@@ -117,4 +117,26 @@ if (window.location.pathname.endsWith("chat.html")) {
             }
         });
     });
-}
+
+    //Tempo da sala
+    function updateCountdown() {
+    database.ref("rooms/" + roomCodeGlobal).get().then(snap => {
+        if (!snap.exists()) return;
+        const room = snap.val();
+        const duration = room.roomDuration || 10 * 60 * 1000; // default 10min
+        const remaining = (room.createdAt + duration) - Date.now();
+        const countdownEl = document.getElementById("countdown");
+        if (remaining <= 0) {
+            countdownEl.textContent = "Sala expirada!";
+        } else {
+            const minutes = Math.floor(remaining / 60000);
+            const seconds = Math.floor((remaining % 60000) / 1000);
+            countdownEl.textContent = `Sala expira em ${minutes}m ${seconds}s`;
+            }
+        });
+    }
+
+        // Atualiza a cada segundo
+        setInterval(updateCountdown, 1000);
+        
+    }
