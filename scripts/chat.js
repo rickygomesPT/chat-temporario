@@ -160,7 +160,7 @@ function uploadFile() {
   formData.append("file", file);
 
   // Enviar ficheiro para File.io
-  fetch("https://file.io", {
+  fetch("https://corsproxy.io/?https://file.io", {
     method: "POST",
     body: formData
   })
