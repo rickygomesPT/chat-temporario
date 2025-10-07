@@ -1,12 +1,12 @@
 // ⚠️ Altere estas variáveis com suas credenciais Firebase
 const firebaseConfig = {
-    apiKey: "SEU_API_KEY",
-    authDomain: "SEU_AUTH_DOMAIN",
-    databaseURL: "SEU_DATABASE_URL",
-    projectId: "SEU_PROJECT_ID",
-    storageBucket: "SEU_STORAGE_BUCKET",
-    messagingSenderId: "SEU_MESSAGING_SENDER_ID",
-    appId: "SEU_APP_ID"
+    apiKey: "AIzaSyDT6QUagkLGAh3QzmmwDATtRlsg2DbwRRw",
+    authDomain: "world-tycoon-sxop6.firebaseapp.com",
+    databaseURL: "https://world-tycoon-sxop6-default-rtdb.europe-west1.firebasedatabase.app/",
+    projectId: "world-tycoon-sxop6",
+    storageBucket: "world-tycoon-sxop6.firebasestorage.app",
+    messagingSenderId: "1091254344255",
+    appId: "1:1091254344255:web:4d45ef9db876895d7e768a"
 };
 
 // Inicializa Firebase
