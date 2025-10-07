@@ -17,12 +17,17 @@
     
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h3 id="roomTitle"></h3>
-      <small id="roomCode" class="text-muted">Código: — </small>
-      <button class="btn btn-secondary mb-3" onclick="goBack()"> ← Voltar </button>
-      <button class="btn btn-danger btn-sm" onclick="deleteRoom()"> Apagar Sala </button>
-    </div>
-
-    <div id="countdown" class="mb-2 text-muted"></div>
+      <small id="roomCode"></small>
+      <div id="countdown"></div>
+      <input type="number" id="newTime" placeholder="minutos">
+      <button onclick="editRoomTime()">Atualizar tempo</button>
+      <div id="chatBox"></div>
+      <input type="text" id="messageInput">
+      <button onclick="sendMessage()">Enviar</button>
+      <input type="file" id="fileInput" onchange="uploadFile()">
+      <button onclick="deleteRoom()">Apagar Sala</button>
+      <button onclick="goBack()">Voltar</button>
+    </div>  
 
     <div id="chatMessages" class="border rounded p-3 mb-3 chat-box"></div>
 
