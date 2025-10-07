@@ -60,17 +60,54 @@ function sendMessage() {
 
 // Upload de ficheiro
 function uploadFile() {
-  const file = document.getElementById("fileInput").files[0];
-  if (!file) return;
+  const fileInput = document.getElementById("fileInput");
+  const file = fileInput.files[0];
+  if (!file) return alert("Escolha um ficheiro.");
   if (file.size > 2 * 1024 * 1024) return alert("Arquivo muito grande! Máx: 2MB.");
 
+  // debug rápido: confirmar storage configurado
+  if (!storage || typeof storage.ref !== 'function') {
+    console.error('Firebase Storage não está inicializado. Verifica os scripts e o storageBucket do config.');
+    return alert('Erro interno: Storage não inicializado (ver console).');
+  }
+
   const fileRef = storage.ref(`${roomCode}/${Date.now()}_${file.name}`);
-  fileRef.put(file).then(snapshot => {
-    snapshot.ref.getDownloadURL().then(url => {
-      roomRef.push({ user: userName, file: url, fileName: file.name, timestamp: Date.now() });
-    });
-  });
+  const uploadTask = fileRef.put(file);
+
+  // criar UI de progresso simples (opcional)
+  const progressEl = document.createElement('div');
+  progressEl.className = "text-center small text-muted";
+  progressEl.textContent = "A enviar...";
+  chatBox.appendChild(progressEl);
+  chatBox.scrollTop = chatBox.scrollHeight;
+
+  uploadTask.on('state_changed',
+    snapshot => {
+      const percent = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+      progressEl.textContent = `Upload: ${percent}%`;
+    },
+    error => {
+      console.error('Upload error:', error);
+      progressEl.textContent = "Erro no upload.";
+      setTimeout(() => progressEl.remove(), 3000);
+    },
+    () => {
+      uploadTask.snapshot.ref.getDownloadURL().then(url => {
+        // push mensagem com ficheiro
+        roomRef.push({
+          user: userName,
+          file: url,
+          fileName: file.name,
+          timestamp: Date.now()
+        });
+        progressEl.textContent = "Ficheiro enviado!";
+        setTimeout(() => progressEl.remove(), 1500);
+        fileInput.value = ""; // limpar input
+      });
+    }
+  );
 }
+
 
 // Contagem decrescente
 function updateCountdown() {
