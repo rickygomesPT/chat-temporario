@@ -1,45 +1,45 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chat Temporário</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Temporário</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="container py-5">
+  <div class="container py-5">
     <h1 class="text-center mb-4">Chat Temporário</h1>
 
     <div class="row">
-        <!-- Criar Sala -->
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h3>Criar Sala</h3>
-                    <input type="text" id="creatorName" class="form-control mb-2" placeholder="Seu Nome">
-                    <input type="text" id="roomName" class="form-control mb-2" placeholder="Nome da Sala">
-                    <input type="text" id="roomCode" class="form-control mb-2" placeholder="Código da Sala">
-                    <input type="number" id="roomTime" class="form-control mb-2" placeholder="Tempo da sala (min)" min="1">
-                    <button class="btn btn-primary w-100" onclick="createRoom()">Criar Sala</button>
-                </div>
-            </div>
+      <!-- Criar Sala -->
+      <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h3>Criar Sala</h3>
+            <input type="text" id="creatorName" class="form-control mb-2" placeholder="Seu Nome">
+            <input type="text" id="roomName" class="form-control mb-2" placeholder="Nome da Sala">
+            <input type="text" id="roomCode" class="form-control mb-2" placeholder="Código da Sala">
+            <input type="number" id="roomTime" class="form-control mb-2" placeholder="Tempo da sala (min)" min="1">
+            <button class="btn btn-primary w-100" onclick="createRoom()">Criar Sala</button>
+          </div>
         </div>
+      </div>
 
-        <!-- Entrar Sala -->
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h3>Entrar em Sala</h3>
-                    <input type="text" id="userName" class="form-control mb-2" placeholder="Seu Nome">
-                    <input type="text" id="joinRoomCode" class="form-control mb-2" placeholder="Código da Sala">
-                    <button class="btn btn-success w-100" onclick="joinRoom()">Entrar</button>
-                </div>
-            </div>
+      <!-- Entrar Sala -->
+      <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h3>Entrar em Sala</h3>
+            <input type="text" id="userName" class="form-control mb-2" placeholder="Seu Nome">
+            <input type="text" id="joinRoomCode" class="form-control mb-2" placeholder="Código da Sala">
+            <button class="btn btn-success w-100" onclick="joinRoom()">Entrar</button>
+          </div>
         </div>
+      </div>
     </div>
-</div>
+  </div>
 
-<script src="script.js"></script>
+  <script src="index.js"></script>
 </body>
 </html>
