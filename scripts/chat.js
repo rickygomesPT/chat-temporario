@@ -45,8 +45,12 @@ roomRef.get().then(snapshot => {
 if (localRoomData) {
   document.getElementById("roomTitle").textContent = localRoomData.roomName || "Sala";
   document.getElementById("roomCode").textContent = "Código: " + roomCode;
-  const remainingMin = Math.ceil((localRoomData.roomExpiresAt - Date.now()) / 60000);
+  if (localRoomData.roomExpiresAt) {
+  const remainingMin = Math.max(0, Math.ceil((localRoomData.roomExpiresAt - Date.now()) / 60000));
   countdownEl.textContent = `Sala expira em ${remainingMin}m`;
+      } else {
+        countdownEl.textContent = `Sala expira em ${Math.ceil((localRoomData.roomDuration || 10 * 60 * 1000) / 60000)}m`;
+}
 }
 
 // --- Header: nome da sala e código ---
