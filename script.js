@@ -2,7 +2,7 @@
 const firebaseConfig = {
     apiKey: "AIzaSyDT6QUagkLGAh3QzmmwDATtRlsg2DbwRRw",
     authDomain: "world-tycoon-sxop6.firebaseapp.com",
-    databaseURL: "https://world-tycoon-sxop6-default-rtdb.europe-west1.firebasedatabase.app",
+    databaseURL: "https://world-tycoon-sxop6.firebaseio.com",
     projectId: "world-tycoon-sxop6",
     storageBucket: "world-tycoon-sxop6.firebasestorage.app",
     messagingSenderId: "1091254344255",
