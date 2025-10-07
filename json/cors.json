@@ -1,0 +1,8 @@
+[
+  {
+    "origin": ["https://rickygomespt.github.io/chat-temporario"],
+    "method": ["GET", "POST", "PUT", "DELETE", "HEAD"],
+    "maxAgeSeconds": 3600,
+    "responseHeader": ["Content-Type", "x-goog-meta-*"]
+  }
+]
