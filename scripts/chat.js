@@ -30,6 +30,17 @@ if (!roomCode || !userName) {
 
 const roomRef = database.ref("rooms/" + roomCode);
 
+// Pegar dados da sala do localStorage
+const localRoomData = JSON.parse(localStorage.getItem("roomData"));
+
+// Atualizar topo da sala imediatamente depois de criar a sala
+if (localRoomData) {
+  document.getElementById("roomTitle").textContent = localRoomData.roomName || "Sala";
+  document.getElementById("roomCode").textContent = "Código: " + roomCode;
+  const remainingMin = Math.ceil((localRoomData.roomExpiresAt - Date.now()) / 60000);
+  countdownEl.textContent = `Sala expira em ${remainingMin}m`;
+}
+
 // --- Header: nome da sala e código ---
 database.ref("rooms/" + roomCode).get().then(snapshot => {
   if (!snapshot.exists()) return;
@@ -186,7 +197,6 @@ function uploadFile() {
       alert("Erro ao enviar o ficheiro.");
     });
 }
-
 
 // --- Apagar sala manualmente ---
 function deleteRoom() {
