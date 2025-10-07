@@ -150,6 +150,17 @@ function updateCountdown() {
 
     if (remaining <= 0) {
       countdownEl.textContent = "Sala expirada!";
+  
+  // Apagar automaticamente após 5 segundos
+  setTimeout(() => {
+    database.ref("rooms/" + roomCode).remove()
+      .then(() => {
+          console.log("Sala expirada removida automaticamente.");
+          alert("A sala expirou e foi eliminada.");
+          window.location.href = "index.html";
+          });
+     }, 5000);
+    return;
     } else {
       const minutes = Math.floor(remaining / 60000);
       const seconds = Math.floor((remaining % 60000) / 1000);
