@@ -120,10 +120,20 @@ function escapeHtml(unsafe) {
 // --- Countdown ---
 function updateCountdown() {
   database.ref("rooms/" + roomCode).get().then(snap => {
-    if (!snap.exists()) return;
+    if (!snap.exists()) {
+      countdownEl.textContent = "Sala expirada!";
+      return;
+    }
+
     const room = snap.val();
-    const expires =
-      room.roomExpiresAt || (room.createdAt + (room.roomDuration || 10 * 60 * 1000));
+
+    // Garantir que createdAt e roomDuration são números
+    const createdAt = Number(room.createdAt) || Date.now();
+    const roomDuration = Number(room.roomDuration) || 10 * 60 * 1000;
+
+    // Calcula a hora de expiração
+    const expires = Number(room.roomExpiresAt) || (createdAt + roomDuration);
+
     const remaining = expires - Date.now();
 
     if (remaining <= 0) {
@@ -135,6 +145,7 @@ function updateCountdown() {
     }
   });
 }
+
 
 setInterval(updateCountdown, 1000);
 
