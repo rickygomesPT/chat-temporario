@@ -6,27 +6,38 @@
 <title>Chat - Sala</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 </head>
-<body class="bg-light">
+<body>
 <div class="container py-4">
+    <button class="btn btn-secondary mb-3" onclick="goBack()">← Voltar</button>
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h3 id="roomTitle"></h3>
-        <button class="btn btn-secondary mb-3" onclick="goBack()"> 🔙 Voltar </button>
-        <button class="btn btn-danger btn-sm" onclick="deleteRoom()"> 🗑️ Apagar Sala </button>
+        <button class="btn btn-danger btn-sm" onclick="deleteRoom()">Apagar Sala</button>
     </div>
+
+    <div id="countdown" class="mb-2 text-muted"></div>
 
     <div id="chatMessages" class="border rounded p-3 mb-3 chat-box"></div>
 
-    <div class="input-group">
+    <div class="input-group mb-2">
         <input type="text" id="messageInput" class="form-control" placeholder="Escreva sua mensagem...">
-        <input type="file" id="fileInput" accept=".jpg,.png,.pdf" />
-        <button class="btn btn-secondary" onclick="uploadFile()">Enviar arquivo</button>
         <button class="btn btn-primary" onclick="sendMessage()">Enviar</button>
+    </div>
+
+    <div class="input-group mb-2">
+        <input type="file" id="fileInput" accept=".jpg,.png,.pdf" class="form-control">
+        <button class="btn btn-secondary" onclick="uploadFile()">Enviar arquivo</button>
+    </div>
+
+    <div class="input-group">
+        <input type="number" id="newTime" class="form-control" placeholder="Editar tempo da sala (min)" min="1">
+        <button class="btn btn-warning" onclick="editRoomTime()">Atualizar tempo</button>
     </div>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
