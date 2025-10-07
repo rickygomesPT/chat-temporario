@@ -9,65 +9,64 @@ const firebaseConfig = {
     appId: "1:1091254344255:web:4d45ef9db876895d7e768a"
 };
 
-// Inicializa Firebase
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
+const storage = firebase.storage();
 
 // Variáveis globais
 let roomCodeGlobal = "";
 let userNameGlobal = "";
 
-// Criar Sala
+// ====== INDEX.HTML ======
 function createRoom() {
     const creator = document.getElementById('creatorName').value.trim();
     const roomName = document.getElementById('roomName').value.trim();
     const roomCode = document.getElementById('roomCode').value.trim();
+    const roomTimeMin = parseInt(document.getElementById('roomTime').value) || 10;
 
     if (!creator || !roomName || !roomCode) return alert("Preencha todos os campos.");
 
     database.ref("rooms/" + roomCode).set({
         roomName: roomName,
         creator: creator,
-        createdAt: Date.now()
+        createdAt: Date.now(),
+        roomDuration: roomTimeMin * 60 * 1000 // converter para ms
     }, (error) => {
         if (!error) {
             localStorage.setItem("userName", creator);
             localStorage.setItem("roomCode", roomCode);
-            window.location.href = "chat.html";
+            window.location.href = "./chat.html";
         }
     });
 }
 
-// Entrar Sala
 function joinRoom() {
     const user = document.getElementById('userName').value.trim();
     const roomCode = document.getElementById('joinRoomCode').value.trim();
-
     if (!user || !roomCode) return alert("Preencha todos os campos.");
 
     database.ref("rooms/" + roomCode).get().then((snapshot) => {
         if (snapshot.exists()) {
             localStorage.setItem("userName", user);
             localStorage.setItem("roomCode", roomCode);
-            window.location.href = "chat.html";
+            window.location.href = "./chat.html";
         } else {
             alert("Sala não encontrada.");
         }
     });
 }
 
-// Chat
+// ====== CHAT.HTML ======
 if (window.location.pathname.endsWith("chat.html")) {
     const chatBox = document.getElementById("chatMessages");
-    const roomCode = localStorage.getItem("roomCode");
-    const userName = localStorage.getItem("userName");
-    roomCodeGlobal = roomCode;
-    userNameGlobal = userName;
+    const countdownEl = document.getElementById("countdown");
 
-    const roomRef = database.ref("rooms/" + roomCode + "/messages");
+    roomCodeGlobal = localStorage.getItem("roomCode");
+    userNameGlobal = localStorage.getItem("userName");
+    const roomRef = database.ref("rooms/" + roomCodeGlobal + "/messages");
 
     // Título da sala
-    database.ref("rooms/" + roomCode).get().then(snap => {
+    database.ref("rooms/" + roomCodeGlobal).get().then(snap => {
         if (snap.exists()) document.getElementById("roomTitle").textContent = snap.val().roomName;
     });
 
@@ -77,8 +76,12 @@ if (window.location.pathname.endsWith("chat.html")) {
         const messages = snapshot.val() || {};
         Object.values(messages).forEach(msg => {
             const div = document.createElement("div");
-            div.className = "chat-message " + (msg.user === userName ? "user" : "other");
-            div.textContent = msg.user + ": " + msg.text;
+            div.className = "chat-message " + (msg.user === userNameGlobal ? "user" : "other");
+            if(msg.file){
+                div.innerHTML = `${msg.user}: <a href="${msg.file}" target="_blank">${msg.fileName}</a>`;
+            } else {
+                div.textContent = `${msg.user}: ${msg.text}`;
+            }
             chatBox.appendChild(div);
         });
         chatBox.scrollTop = chatBox.scrollHeight;
@@ -88,55 +91,63 @@ if (window.location.pathname.endsWith("chat.html")) {
     window.sendMessage = function() {
         const input = document.getElementById("messageInput");
         const text = input.value.trim();
-        if (!text) return;
+        if(!text) return;
 
-        roomRef.push({ user: userName, text: text, timestamp: Date.now() });
+        roomRef.push({ user: userNameGlobal, text: text, timestamp: Date.now() });
         input.value = "";
     };
 
-    //Botão voltar à página principal
-    function goBack() {
-        window.location.href = "./index.html"; // ou caminho relativo correto
-    }
-   
-    // Apagar sala
-    window.deleteRoom = function() {
-        if (confirm("Deseja apagar esta sala? Todas as mensagens serão perdidas.")) {
-            database.ref("rooms/" + roomCode).remove();
-            localStorage.removeItem("roomCode");
-            localStorage.removeItem("userName");
-            window.location.href = "index.html";
-        }
+    // Upload arquivo
+    window.uploadFile = function() {
+        const file = document.getElementById("fileInput").files[0];
+        if(!file) return;
+        if(file.size > 2*1024*1024) return alert("Arquivo muito grande! Max 2MB.");
+
+        const fileRef = storage.ref(`${roomCodeGlobal}/${Date.now()}_${file.name}`);
+        fileRef.put(file).then(snapshot => {
+            snapshot.ref.getDownloadURL().then(url => {
+                roomRef.push({ user: userNameGlobal, file: url, fileName: file.name, timestamp: Date.now() });
+            });
+        });
     };
 
-    // Apagar chat ao fechar a aba (se for o criador)
-    window.addEventListener("beforeunload", () => {
-        database.ref("rooms/" + roomCode).get().then(snap => {
-            if (snap.exists() && snap.val().creator === userName) {
-                database.ref("rooms/" + roomCode).remove();
-            }
-        });
-    });
-
-    //Tempo da sala
+    // Contador da sala
     function updateCountdown() {
-    database.ref("rooms/" + roomCodeGlobal).get().then(snap => {
-        if (!snap.exists()) return;
-        const room = snap.val();
-        const duration = room.roomDuration || 10 * 60 * 1000; // default 10min
-        const remaining = (room.createdAt + duration) - Date.now();
-        const countdownEl = document.getElementById("countdown");
-        if (remaining <= 0) {
-            countdownEl.textContent = "Sala expirada!";
-        } else {
-            const minutes = Math.floor(remaining / 60000);
-            const seconds = Math.floor((remaining % 60000) / 1000);
-            countdownEl.textContent = `Sala expira em ${minutes}m ${seconds}s`;
+        database.ref("rooms/" + roomCodeGlobal).get().then(snap => {
+            if(!snap.exists()) return;
+            const room = snap.val();
+            const duration = room.roomDuration || 10*60*1000;
+            const remaining = (room.createdAt + duration) - Date.now();
+            if(remaining <= 0){
+                countdownEl.textContent = "Sala expirada!";
+            } else {
+                const minutes = Math.floor(remaining / 60000);
+                const seconds = Math.floor((remaining % 60000)/1000);
+                countdownEl.textContent = `Sala expira em ${minutes}m ${seconds}s`;
             }
         });
     }
+    setInterval(updateCountdown, 1000);
 
-        // Atualiza a cada segundo
-        setInterval(updateCountdown, 1000);
-        
-    }
+    // Editar tempo da sala
+    window.editRoomTime = function() {
+        const newTime = parseInt(document.getElementById("newTime").value);
+        if(!newTime || newTime < 1) return alert("Digite um tempo válido.");
+        database.ref("rooms/" + roomCodeGlobal).update({ roomDuration: newTime*60*1000 });
+    };
+
+    // Botão voltar
+    window.goBack = function() {
+        window.location.href = "./index.html";
+    };
+
+    // Apagar sala
+    window.deleteRoom = function() {
+        if(confirm("Deseja apagar esta sala? Todas as mensagens serão perdidas.")){
+            database.ref("rooms/" + roomCodeGlobal).remove();
+            localStorage.removeItem("roomCode");
+            localStorage.removeItem("userName");
+            window.location.href = "./index.html";
+        }
+    };
+}
