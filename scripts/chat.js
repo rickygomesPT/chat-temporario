@@ -28,8 +28,6 @@ if (!roomCode || !userName) {
   window.location.href = "index.html";
 }
 
-const roomRef = database.ref("rooms/" + roomCode);
-
 // Pegar dados da sala do localStorage
 const localRoomData = JSON.parse(localStorage.getItem("roomData"));
 
