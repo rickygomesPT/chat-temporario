@@ -26,7 +26,9 @@ database.ref("rooms/" + roomCode).get().then(snapshot => {
     const localRoomData = JSON.parse(localStorage.getItem("roomData"));
     if (localRoomData) database.ref("rooms/" + roomCode).set(localRoomData);
   } else {
-    document.getElementById("roomTitle").textContent = snapshot.val().roomName;
+    const room = snapshot.val();
+    document.getElementById("roomTitle").textContent = room.roomName || 'Sala';
+    document.getElementById("roomCode").textContent = 'Código: ' + roomCode;
   }
 });
 
