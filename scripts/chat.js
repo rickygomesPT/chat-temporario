@@ -65,10 +65,11 @@ roomRef.on("value", snapshot => {
     div.className = "chat-message " + (msg.user === userName ? "user" : "other");
 
     if (msg.file) {
-      if (msg.fileName && msg.fileName.match(/\.(jpg|jpeg|png|gif)$/i)) {
-        div.innerHTML = `${msg.user}:<br><a href="${msg.file}" target="_blank"><img src="${msg.file}" style="max-width:220px;border-radius:8px"></a>`;
+      // Verifica se é imagem
+      if (msg.fileName.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+        messageDiv.innerHTML += `<br><img src="${msg.fileUrl}" alt="${msg.fileName}" style="max-width:200px;border-radius:8px;margin-top:5px;">`;
       } else {
-        div.innerHTML = `${msg.user}: <a href="${msg.file}" target="_blank">${msg.fileName}</a>`;
+        messageDiv.innerHTML += `<br><a href="${msg.fileUrl}" target="_blank">📎 ${msg.fileName}</a>`;
       }
     } else {
       div.innerHTML = `${msg.user}: ${escapeHtml(msg.text || "")}`;
@@ -145,54 +146,47 @@ function editRoomTime() {
     });
 }
 
-// --- Upload de ficheiro ---
+// --- Função para enviar ficheiros via file.io ---
 function uploadFile() {
+  const fileInput = document.getElementById("fileInput");
   const file = fileInput.files[0];
-  if (!file) return alert("Escolha um ficheiro.");
-  if (file.size > 2 * 1024 * 1024) return alert("Máximo permitido: 2MB.");
-
-  if (!storage || typeof storage.ref !== "function") {
-    console.error("Firebase Storage não inicializado.");
-    return alert("Erro interno: Storage não configurado.");
+  if (!file) {
+    alert("Escolhe um ficheiro primeiro!");
+    return;
   }
 
-  const fileRef = storage.ref(`${roomCode}/${Date.now()}_${file.name}`);
-  const uploadTask = fileRef.put(file);
+  // Criar FormData para enviar o ficheiro
+  const formData = new FormData();
+  formData.append("file", file);
 
-  const progressEl = document.createElement("div");
-  progressEl.className = "text-center small text-muted";
-  progressEl.textContent = "A enviar...";
-  chatBox.appendChild(progressEl);
-  chatBox.scrollTop = chatBox.scrollHeight;
-
-  uploadTask.on(
-    "state_changed",
-    snapshot => {
-      const percent = Math.round(
-        (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-      );
-      progressEl.textContent = `Upload: ${percent}%`;
-    },
-    error => {
-      console.error("Upload error:", error);
-      progressEl.textContent = "Erro no upload.";
-      setTimeout(() => progressEl.remove(), 3000);
-    },
-    () => {
-      uploadTask.snapshot.ref.getDownloadURL().then(url => {
-        roomRef.push({
+  // Enviar ficheiro para File.io
+  fetch("https://file.io", {
+    method: "POST",
+    body: formData
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        // Envia a mensagem para o Firebase com o link do ficheiro
+        const msgData = {
           user: userName,
-          file: url,
           fileName: file.name,
+          fileUrl: data.link,
           timestamp: Date.now()
-        });
-        progressEl.textContent = "Ficheiro enviado!";
-        setTimeout(() => progressEl.remove(), 1500);
-        fileInput.value = "";
-      });
-    }
-  );
+        };
+        roomRef.push(msgData);
+        fileInput.value = ""; // limpar input
+      } else {
+        alert("Erro ao enviar o ficheiro. Tenta novamente.");
+        console.error(data);
+      }
+    })
+    .catch(err => {
+      console.error("Erro no upload:", err);
+      alert("Erro ao enviar o ficheiro.");
+    });
 }
+
 
 // --- Apagar sala manualmente ---
 function deleteRoom() {
