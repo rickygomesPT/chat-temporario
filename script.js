@@ -94,6 +94,11 @@ if (window.location.pathname.endsWith("chat.html")) {
         input.value = "";
     };
 
+    //Botão voltar à página principal
+    function goBack() {
+        window.location.href = "./index.html"; // ou caminho relativo correto
+    }
+   
     // Apagar sala
     window.deleteRoom = function() {
         if (confirm("Deseja apagar esta sala? Todas as mensagens serão perdidas.")) {
