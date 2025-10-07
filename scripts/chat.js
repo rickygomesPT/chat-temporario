@@ -155,31 +155,31 @@ function uploadFile() {
     return;
   }
 
-  // Criar FormData para enviar o ficheiro
+  // Limite de 8 MB (limite do uguu.se)
+  if (file.size > 8 * 1024 * 1024) {
+    alert("O ficheiro é demasiado grande (máx. 8MB).");
+    return;
+  }
+
   const formData = new FormData();
   formData.append("file", file);
 
-  // Enviar ficheiro para File.io
-  fetch("https://corsproxy.io/?https://file.io", {
+  // Uguu.se API – sem CORS!
+  fetch("https://uguu.se/api.php?d=upload-tool", {
     method: "POST",
     body: formData
   })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        // Envia a mensagem para o Firebase com o link do ficheiro
-        const msgData = {
-          user: userName,
-          fileName: file.name,
-          fileUrl: data.link,
-          timestamp: Date.now()
-        };
-        roomRef.push(msgData);
-        fileInput.value = ""; // limpar input
-      } else {
-        alert("Erro ao enviar o ficheiro. Tenta novamente.");
-        console.error(data);
-      }
+    .then(res => res.text())
+    .then(link => {
+      // Envia mensagem com link do ficheiro
+      const msgData = {
+        user: userName,
+        fileName: file.name,
+        fileUrl: link.trim(),
+        timestamp: Date.now()
+      };
+      roomRef.push(msgData);
+      fileInput.value = "";
     })
     .catch(err => {
       console.error("Erro no upload:", err);
