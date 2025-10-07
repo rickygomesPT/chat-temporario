@@ -77,8 +77,9 @@ function updateCountdown() {
   database.ref("rooms/" + roomCode).get().then(snap => {
     if (!snap.exists()) return;
     const room = snap.val();
-    const duration = room.roomDuration || 10 * 60 * 1000;
-    const remaining = (room.createdAt + duration) - Date.now();
+    // prefer roomExpiresAt, fallback para createdAt + roomDuration
+    const expires = room.roomExpiresAt || (room.createdAt + (room.roomDuration || 10*60*1000));
+    const remaining = expires - Date.now();
     if (remaining <= 0) {
       countdownEl.textContent = "Sala expirada!";
     } else {
@@ -88,13 +89,21 @@ function updateCountdown() {
     }
   });
 }
-setInterval(updateCountdown, 1000);
+//setInterval(updateCountdown, 1000);
 
 // Editar tempo
 function editRoomTime() {
-  const newTime = parseInt(document.getElementById("newTime").value);
+  const newTime = parseInt(document.getElementById("newTime").value, 10);
   if (!newTime || newTime < 1) return alert("Digite um tempo válido.");
-  database.ref("rooms/" + roomCode).update({ roomDuration: newTime * 60 * 1000 });
+  const newDurationMs = newTime * 60 * 1000;
+  const newExpiresAt = Date.now() + newDurationMs;
+  database.ref("rooms/" + roomCode).update({
+    roomDuration: newDurationMs,
+    roomExpiresAt: newExpiresAt
+  }).then(() => {
+    // feedback imediato (opcional)
+    console.log("Tempo atualizado para", newTime, "minutos");
+  });
 }
 
 // Voltar e apagar
