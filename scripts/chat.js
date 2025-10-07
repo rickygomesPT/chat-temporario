@@ -33,6 +33,16 @@ const roomRef = database.ref("rooms/" + roomCode);
 // Pegar dados da sala do localStorage
 const localRoomData = JSON.parse(localStorage.getItem("roomData"));
 
+// Referência da sala
+const roomRef = database.ref("rooms/" + roomCode);
+
+// Criar a sala no Firebase caso ainda não exista
+roomRef.get().then(snapshot => {
+  if (!snapshot.exists() && localRoomData) {
+    roomRef.set(localRoomData);
+  }
+});
+
 // Atualizar topo da sala imediatamente depois de criar a sala
 if (localRoomData) {
   document.getElementById("roomTitle").textContent = localRoomData.roomName || "Sala";
