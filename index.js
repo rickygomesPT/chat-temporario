@@ -12,7 +12,8 @@ function createRoom() {
     roomName: roomName,
     creator: creator,
     createdAt: Date.now(),
-    roomDuration: roomTimeMin * 60 * 1000
+    roomDuration: roomTimeMin * 60 * 1000,
+    roomExpiresAt: Date.now() + roomTimeMin * 60 * 1000
   };
 
   localStorage.setItem("roomData", JSON.stringify(roomData));
